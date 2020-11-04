@@ -192,6 +192,7 @@ namespace BeanSeans.Controllers
 
             //if we got so far, then the model is not valid sp send back create form
             var errors = ModelState.Values.SelectMany(v => v.Errors);
+
             m.Sitting = sitting;
             return View(m);
         }

@@ -93,7 +93,9 @@ namespace BeanSeans.Areas.Staff.Controllers
             {
                 return NotFound();
 
+
             }
+
             //get reservations from the specific sitting 
             var reservations = await _db.Reservations.Where(r => r.SittingId == sitting.Id).ToListAsync();
             //get sum of resvervations' guests  from the sitting
@@ -101,26 +103,34 @@ namespace BeanSeans.Areas.Staff.Controllers
             var totalGuest = reservations.Sum(r => r.Guest);
             var possibleCapacity = sitting.Capacity - totalGuest;
            
-            //when the capacity is full or 
-            if (possibleCapacity < m.Guest)
-            {
-                ViewBag.Guest = "<script>alert('Invalid guest number')</script>";
+         
+            
+
+            if (! ModelState.IsValid || possibleCapacity < m.Guest|| m.Guest<=0)
+            {            //when the capacity is full or 
+
+                if (possibleCapacity < m.Guest || m.Guest <= 0)
+                {
+                    ViewBag.Guest = "<script>alert('Invalid guest number')</script>";
+                }
+              //  var errors = ModelState.Values.SelectMany(v => v.Errors);
+                m.SittingId = sitting.Id;
                 return View(m);
             }
-           
-            if (ModelState.IsValid)
+            else
             {
                 var member = await _db.Members.FirstOrDefaultAsync(me => me.Id == m.MemberId);
-                var r = new Reservation {
-                
-                Guest=m.Guest,
-                Duration=m.Duration,
-                Note=m.Note,
-                SourceId=m.SourceId,
-                StartTime=m.StartTime,
-                StatusId=1,
-                SittingId=sitting.Id
-                
+                var r = new Reservation
+                {
+
+                    Guest = m.Guest,
+                    Duration = m.Duration,
+                    Note = m.Note,
+                    SourceId = m.SourceId,
+                    StartTime = m.StartTime,
+                    StatusId = 1,
+                    SittingId = sitting.Id
+
                 };
                 //connect reservation and person
                 member.Reservations.Add(r);
@@ -129,9 +139,8 @@ namespace BeanSeans.Areas.Staff.Controllers
                 return RedirectToAction(nameof(Confirmation), new { id = r.Id });
 
             }
-            var errors = ModelState.Values.SelectMany(v => v.Errors);
-            m.SittingId = sitting.Id;
-            return View(m);
+          
+
         }
 
 
