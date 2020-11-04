@@ -1,0 +1,13 @@
+﻿@model IEnumerable<BeanSeans.Data.Reservation>
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<a asp-area="" asp-controller="Reservation" asp-action="Sittings">Place Reservation</a>
+<h1>My Reservation</h1>
+@foreach (var r in Model)
+{<p>@r.StartTime</p>
+<p>@r.Status.Name</p>
+}

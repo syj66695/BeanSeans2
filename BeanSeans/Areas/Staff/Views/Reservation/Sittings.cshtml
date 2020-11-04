@@ -1,0 +1,52 @@
+﻿@model IEnumerable<BeanSeans.Data.Sitting>
+
+@{
+    ViewData["Title"] = "Reservation-Select Date";
+}
+
+<h1>Make reservation as a manager</h1>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.SittingType.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Start)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.End)
+            </th>
+
+
+            <th></th>
+
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.SittingType.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Start)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.End)
+            </td>
+
+
+            <td>
+                <a asp-action="CreateMemberReservation" asp-route-id="@item.Id">New Member Reserrvation</a>
+
+           <br/>
+                <a asp-area="" asp-controller="Reservation" asp-action="Create" asp-route-id="@item.Id">New Guest Reservation</a>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
