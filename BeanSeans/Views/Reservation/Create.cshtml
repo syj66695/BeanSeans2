@@ -4,8 +4,8 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Place Reservation</h1>
-<p>Start TIme</p>
+<h1 class="display-4">Place Reservation</h1>
+<p>Start Time</p>
 <p id="sitting-start">@Model.Sitting.Start</p>
 <p>End Time</p>
 <p id="sitting-end">@Model.Sitting.End</p>
@@ -17,7 +17,7 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-            @if (! (User.Identity.IsAuthenticated && User.IsInRole("Member"))) //!--user is not login
+            @if (!User.Identity.IsAuthenticated) //!--user is not login
             {
                 <div class="form-group">
                     <label asp-for="Person.FirstName" class="control-label"></label>

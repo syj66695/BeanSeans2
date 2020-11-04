@@ -4,15 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<h1 class="display-4" >Reservation Details</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>
+             <th>
                 @Html.DisplayNameFor(model => model.Person)
             </th>
             <th>
@@ -42,15 +40,17 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-           
             <td>
-                @Html.DisplayFor(modelItem => item.Sitting.Id)
+                @Html.DisplayFor(modelItem => item.Person.FirstName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Status.Id)
+                @Html.DisplayFor(modelItem => item.Sitting.SittingType.Name)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Source.Id)
+                @Html.DisplayFor(modelItem => item.Status.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Source.Name)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Guest)
