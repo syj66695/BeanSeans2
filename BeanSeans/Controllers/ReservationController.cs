@@ -26,25 +26,27 @@ namespace BeanSeans.Controllers
         //we have to have sittings to make reserv
         //when we add reservation, first we add siting
         //model: Sitting, List Tep
-        public IActionResult Sittings()
+        public  async Task<IActionResult> Sittings()
         {
-            return View(_db.Sittings.ToList());
+            var sittings = await _db.Sittings
+                                   .Include(s => s.SittingType)
+                                       .OrderBy(s =>s.Start)
+                                        .ToListAsync();
+            return View(sittings);
         }
         //after sitting, user will be navigated to tables to choose area and table
       
         // GET: Reservation
         public async Task<IActionResult> Index()
-        {  
-            
-            var reservations = await _db.Reservations
-                                        .Include(r => r.Person)
-                                        .Include(r => r.Sitting)
-                                        .ThenInclude(st=>st.SittingType)
-                                        .Include(r => r.Source)
-                                        .Include(r => r.Status)
-                                        .ToListAsync();
-           
-            return View(reservations);
+        {
+            var reservation = await _db.Reservations
+                .Include(r => r.Person)
+                  .Include(r => r.Sitting)
+                     .ThenInclude(s => s.SittingType)
+                      .Include(r => r.Source)
+                          .Include(r => r.Status).ToListAsync();
+                
+            return View( reservation);
         }
 
         // GET: Reservation/Details/5
@@ -58,6 +60,7 @@ namespace BeanSeans.Controllers
             var reservation = await _db.Reservations
                 .Include(r => r.Person)
                 .Include(r => r.Sitting)
+                .ThenInclude(s => s.SittingType)
                 .Include(r => r.Source)
                 .Include(r => r.Status)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -168,16 +171,6 @@ namespace BeanSeans.Controllers
                 {
                     return RedirectToAction("Index", "Reservation", new { Area = "Member" });
                 }
-                else if (User.Identity.IsAuthenticated && (User.IsInRole("Manager") || User.IsInRole("Staff")))
-                {
-                    //                return RedirectToAction(nameof(Confirmation), new { id = r.Id });
-
-                    //  return RedirectToAction("Confirmation", "ReservationController", new { Area = "Staff" });
-                    //return RedirectToAction("Index", new { id = currentcoupon.Companyid.id, Area="Admin" });
-                    return RedirectToAction("Confirmation", new { id = r.Id, Area = "Staff" });
-
-                   
-                }
 
                 return RedirectToAction(nameof(Details), new { id = r.Id });
             }
@@ -192,11 +185,10 @@ namespace BeanSeans.Controllers
 
             //if we got so far, then the model is not valid sp send back create form
             var errors = ModelState.Values.SelectMany(v => v.Errors);
-
             m.Sitting = sitting;
             return View(m);
         }
-
+        [HttpGet]
         // GET: Reservation/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
@@ -206,14 +198,18 @@ namespace BeanSeans.Controllers
             }
 
             var reservation = await _db.Reservations.FindAsync(id);
+                
+
             if (reservation == null)
             {
                 return NotFound();
             }
-            ViewData["PersonId"] = new SelectList(_db.People, "Id", "Discriminator", reservation.PersonId);
-            ViewData["SittingId"] = new SelectList(_db.Sittings, "Id", "Id", reservation.SittingId);
-            ViewData["SourceId"] = new SelectList(_db.ReservationSources, "Id", "Id", reservation.SourceId);
-            ViewData["StatusId"] = new SelectList(_db.ReservationStatuses, "Id", "Id", reservation.StatusId);
+
+            //ViewData["PersonId"] = new SelectList(_db.People, "Id", "Discriminator", reservation.PersonId);
+            //ViewData["SittingId"] = new SelectList(_db.Sittings, "Id", "Id", reservation.SittingId);
+            //ViewData["SourceId"] = new SelectList(_db.ReservationSources, "Id", "Id", reservation.SourceId);
+            //ViewData["StatusId"] = new SelectList(_db.ReservationStatuses, "Id", "Id", reservation.StatusId);
+
             return View(reservation);
         }
 
@@ -222,17 +218,15 @@ namespace BeanSeans.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("PersonId,SittingId,StatusId,SourceId,Id,Guest,StartTime,Duration,Note")] Reservation reservation)
+        public async Task<IActionResult> Edit(Reservation reservation)
         {
-            if (id != reservation.Id)
-            {
-                return NotFound();
-            }
+            
 
             if (ModelState.IsValid)
             {
                 try
                 {
+                   
                     _db.Update(reservation);
                     await _db.SaveChangesAsync();
                 }
@@ -249,10 +243,7 @@ namespace BeanSeans.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PersonId"] = new SelectList(_db.People, "Id", "Discriminator", reservation.PersonId);
-            ViewData["SittingId"] = new SelectList(_db.Sittings, "Id", "Id", reservation.SittingId);
-            ViewData["SourceId"] = new SelectList(_db.ReservationSources, "Id", "Id", reservation.SourceId);
-            ViewData["StatusId"] = new SelectList(_db.ReservationStatuses, "Id", "Id", reservation.StatusId);
+            
             return View(reservation);
         }
 
